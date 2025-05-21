@@ -1,0 +1,64 @@
+services:
+  db:
+    image: mariadb:10.11
+    container_name: volumidev_db
+    restart: always
+    env_file:
+      - .env
+    volumes:
+      - db_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - volumidev
+
+  backend:
+    build:
+      context: ../backend
+      dockerfile: Dockerfile
+    container_name: volumidev_backend
+    restart: always
+    ports:
+      - "8080:8080"
+    env_file:
+      - .env
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+      SPRING_DATASOURCE_URL: jdbc:mariadb://db:3306/${DB_NAME}
+      DB_USER: ${DB_USER}
+      DB_PASSWORD: ${DB_PASSWORD}
+      CORS_ALLOWED_ORIGIN: http://volumidev.duckdns.org:8080
+      SPRING_MAIL_HOST: smtp.gmail.com
+      SPRING_MAIL_PORT: 587
+      MAIL_USERNAME: ${MAIL_USERNAME}
+      MAIL_PASSWORD: ${MAIL_PASSWORD}
+    volumes:
+      - ../backend/.env:/app/.env:ro
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - volumidev
+
+  frontend:
+    build:
+      context: ../frontend
+      dockerfile: Dockerfile
+    container_name: volumidev_frontend
+    restart: always
+    ports:
+      - "80:80"
+    depends_on:
+      - backend
+    networks:
+      - volumidev
+
+volumes:
+  db_data:
+
+networks:
+  volumidev:
+    driver: bridge
