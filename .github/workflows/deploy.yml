@@ -22,7 +22,7 @@ jobs:
           username: ${{ secrets.SERVER_USER }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           source: "."
-          target: "/ruta/en/tu/servidor/deploy"
+          target: "/root/PequeGest/compose"
 
       - name: Run deployment commands on server
         uses: appleboy/ssh-action@v1.0.3
@@ -31,7 +31,7 @@ jobs:
           username: ${{ secrets.SERVER_USER }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
-            cd /ruta/en/tu/servidor/deploy
+            cd /root/PequeGest/compose
             docker compose pull
             docker compose down
             docker compose up -d --build
