@@ -1,0 +1,37 @@
+name: Deploy to Server
+
+on:
+  push:
+    branches:
+      - main
+  repository_dispatch:
+    types: [deploy-request]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout deploy repo
+        uses: actions/checkout@v4
+
+      - name: Copy compose files to server
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ secrets.SERVER_IP }}
+          username: ${{ secrets.SERVER_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          source: "."
+          target: "/ruta/en/tu/servidor/deploy"
+
+      - name: Run deployment commands on server
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.SERVER_IP }}
+          username: ${{ secrets.SERVER_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          script: |
+            cd /ruta/en/tu/servidor/deploy
+            docker compose pull
+            docker compose down
+            docker compose up -d --build
