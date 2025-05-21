@@ -16,9 +16,7 @@ services:
       - volumidev
 
   backend:
-    build:
-      context: ../backend
-      dockerfile: Dockerfile
+    image: ghcr.io/volumidev/pequegest-backend:latest
     container_name: volumidev_backend
     restart: always
     ports:
@@ -35,8 +33,6 @@ services:
       SPRING_MAIL_PORT: 587
       MAIL_USERNAME: ${MAIL_USERNAME}
       MAIL_PASSWORD: ${MAIL_PASSWORD}
-    volumes:
-      - ../backend/.env:/app/.env:ro
     depends_on:
       db:
         condition: service_healthy
@@ -44,9 +40,7 @@ services:
       - volumidev
 
   frontend:
-    build:
-      context: ../frontend
-      dockerfile: Dockerfile
+    image: ghcr.io/volumidev/pequegest-frontend:latest
     container_name: volumidev_frontend
     restart: always
     ports:
