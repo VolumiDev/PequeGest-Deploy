@@ -35,7 +35,7 @@ services:
       MAIL_PASSWORD: ${MAIL_PASSWORD}
     volumes:
       - /root/PequeGest/peque-uploads:/app/uploads
-      - /root/PequeGest/backend:/app/.env
+      - /root/PequeGest/backend/.env:/app/.env:ro
     depends_on:
       db:
         condition: service_healthy
